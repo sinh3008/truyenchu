@@ -1,26 +1,180 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ═══ Core Palette ═══ */
+  --bg-primary: #08090d;
+  --bg-secondary: #0e1117;
+  --bg-card: #12151c;
+  --bg-elevated: #181c25;
+  --bg-input: #161a23;
+
+  /* ═══ Text ═══ */
+  --text-primary: #e2e4e9;
+  --text-secondary: #8b93a7;
+  --text-muted: #555d72;
+  --text-heading: #f0f1f4;
+
+  /* ═══ Accent — Champagne Gold ═══ */
+  --accent: #c9a84c;
+  --accent-hover: #d4b458;
+  --accent-soft: rgba(201, 168, 76, 0.10);
+  --accent-glow: rgba(201, 168, 76, 0.20);
+  --accent-foreground: #0c0b08;
+
+  /* ═══ Borders ═══ */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.09);
+  --border-accent: rgba(201, 168, 76, 0.22);
+
+  /* ═══ Status ═══ */
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+
+  /* ═══ Radius ═══ */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-card: var(--bg-card);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-input: var(--bg-input);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-heading: var(--text-heading);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-light: var(--border-light);
+  --color-border-accent: var(--border-accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  /* Font system: Manrope headings, Inter body */
+  --font-heading: var(--font-manrope);
+  --font-body: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ═══════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.07) transparent;
+}
+
+html {
+  font-size: 15px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body), 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+::selection {
+  background: rgba(201, 168, 76, 0.25);
+  color: var(--text-heading);
+}
+
+/* ═══════════════════════════════════════
+   HEADING UTILITY
+   ═══════════════════════════════════════ */
+.font-heading {
+  font-family: var(--font-heading), 'Manrope', sans-serif;
+}
+
+/* ═══════════════════════════════════════
+   GLASS UTILITY
+   ═══════════════════════════════════════ */
+.glass {
+  background: rgba(18, 21, 28, 0.65);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-strong {
+  background: rgba(12, 15, 21, 0.88);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* ═══════════════════════════════════════
+   READING TYPOGRAPHY — optimized for Vietnamese novel reading
+   ═══════════════════════════════════════ */
+.story-content {
+  font-family: var(--font-body), 'Inter', sans-serif;
+  font-size: 1.0625rem;   /* 17px */
+  line-height: 1.95;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+}
+
+/* Each paragraph gets proper vertical breathing room */
+.story-content p {
+  margin-top: 0;
+  margin-bottom: 1.5em;
+  text-indent: 0;
+}
+
+.story-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Inline line breaks inside a paragraph */
+.story-content br {
+  display: block;
+  content: '';
+  margin-top: 0.25em;
+}
+
+/* Bold / Italic */
+.story-content strong,
+.story-content b {
+  color: var(--text-heading);
+  font-weight: 600;
+}
+
+.story-content em,
+.story-content i {
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+/* ═══════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════ */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Story {
+  id                Int         @id @default(autoincrement())
+  title             String
+  slug              String      @unique
+  alt_title         String?
+  author            String?
+  short_description String?
+  full_description  String?
+  cover_image       String?     // URL
+  cover_image_id    String?     // Cloudinary ID
+  status            String      @default("ONGOING") // ONGOING, COMPLETED
+  genres            String?     // Comma separated
+  is_featured       Boolean     @default(false)
+  
+  parts             StoryPart[]
+  chapters          Chapter[]
+  
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+}
+
+model StoryPart {
+  id                Int         @id @default(autoincrement())
+  story_id          Int
+  title             String
+  part_number       Int
+  description       String?
+  
+  story             Story       @relation(fields: [story_id], references: [id], onDelete: Cascade)
+  chapters          Chapter[]
+
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+  
+  @@unique([story_id, part_number])
+}
+
+model Chapter {
+  id                Int         @id @default(autoincrement())
+  story_id          Int
+  part_id           Int
+  title             String
+  chapter_number    Int
+  slug              String
+  content           String
+  is_published      Boolean     @default(false)
+  
+  story             Story       @relation(fields: [story_id], references: [id], onDelete: Cascade)
+  part              StoryPart   @relation(fields: [part_id], references: [id], onDelete: Cascade)
+
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+  
+  @@unique([story_id, chapter_number])
+  @@unique([story_id, slug])
+}
+
+model Admin {
+  id                Int         @id @default(autoincrement())
+  username          String      @unique
+  password_hash     String
+  created_at        DateTime    @default(now())
+}
