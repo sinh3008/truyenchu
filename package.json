@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:cf": "next build && node_modules/.bin/opennextjs-cloudflare build",
+    "preview": "next build && node_modules/.bin/opennextjs-cloudflare build && npx wrangler dev",
+    "deploy": "npm run build:cf && npx wrangler deploy",
+    "cf:secret": "npx wrangler secret put"
   },
   "dependencies": {
     "@libsql/client": "^0.17.2",
@@ -25,6 +29,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.19.1",
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
@@ -36,7 +41,8 @@
     "prisma": "^7.7.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.83.0"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

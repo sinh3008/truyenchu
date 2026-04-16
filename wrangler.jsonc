@@ -1,0 +1,38 @@
+{
+  // Cloudflare Workers config for NovelVerse (OpenNext adapter)
+  // https://opennext.js.org/cloudflare
+  "name": "truyenchu",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  // ── Assets ──
+  // Static assets are served from the .open-next/assets directory
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // ── Environment variables (secrets set via `wrangler secret put`) ──
+  // DO NOT put real secrets here — add them as Cloudflare Worker secrets or
+  // in the Cloudflare dashboard: Workers > truyenchu > Settings > Variables
+  "vars": {
+    "NODE_ENV": "production"
+  },
+  // ── Custom domain / routes ──
+  // Uncomment and fill in your actual zone and domain after deployment:
+  "routes": [
+    {
+      "pattern": "sinhstudio.org/*",
+      "zone_name": "sinhstudio.org"
+    },
+    {
+      "pattern": "www.sinhstudio.org/*",
+      "zone_name": "sinhstudio.org"
+    }
+  ],
+  // ── Observability ──
+  "observability": {
+    "enabled": true
+  }
+}
