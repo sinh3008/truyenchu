@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Tài khoản hoặc mật khẩu không đúng' }, { status: 401 });
     }
 
-    const token = signToken({ id: admin.id, username: admin.username });
+    const token = await signToken({ id: admin.id, username: admin.username });
 
     const response = NextResponse.json({ success: true });
     response.cookies.set('admin_token', token, {
