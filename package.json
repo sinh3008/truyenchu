@@ -8,9 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:cf": "next build && node_modules/.bin/opennextjs-cloudflare build",
-    "preview": "next build && node_modules/.bin/opennextjs-cloudflare build && npx wrangler dev",
-    "deploy": "npm run build:cf && npx wrangler deploy",
+    "build:worker": "npx opennextjs-cloudflare build",
+    "preview": "npx opennextjs-cloudflare build && npx wrangler dev",
+    "deploy": "npx opennextjs-cloudflare build && npx wrangler deploy",
     "cf:secret": "npx wrangler secret put"
   },
   "dependencies": {
