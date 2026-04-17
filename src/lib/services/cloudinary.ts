@@ -1,50 +1,97 @@
-import { v2 as cloudinary } from 'cloudinary';
-
-// Configure Cloudinary with environment variables
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 export interface UploadResult {
   url: string;
   publicId: string;
 }
 
 /**
- * Uploads an image base64 string to Cloudinary
- * @param base64Image The image as a base64 Data URI string (e.g. data:image/jpeg;base64,... )
- * @param folder The folder in Cloudinary to store the image
- * @returns UploadResult containing url and publicId
+ * Helper to generate a SHA-1 hex string
  */
-export async function uploadImage(base64Image: string, folder: string = 'truyenchu'): Promise<UploadResult> {
-  try {
-    const result = await cloudinary.uploader.upload(base64Image, {
-      folder: folder,
-      resource_type: 'image',
-    });
-    
-    return {
-      url: result.secure_url,
-      publicId: result.public_id,
-    };
-  } catch (error) {
-    console.error("Error uploading image to Cloudinary:", error);
-    throw new Error("Failed to upload image.");
-  }
+async function digestMessage(message: string): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-1", msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-/**
- * Deletes an image from Cloudinary
- * @param publicId The public ID of the image to delete
- */
+export async function uploadImage(
+  base64Image: string,
+  folder: string = "truyenchu"
+): Promise<UploadResult> {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  if (!cloudName || !apiKey || !apiSecret) {
+    throw new Error("Missing Cloudinary credentials");
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+
+  // Create signature for Cloudinary Authentication
+  // signature string must be alphabetically sorted params
+  const signatureString = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
+  const signature = await digestMessage(signatureString);
+
+  const formData = new FormData();
+  formData.append("file", base64Image);
+  formData.append("api_key", apiKey);
+  formData.append("timestamp", timestamp);
+  formData.append("signature", signature);
+  formData.append("folder", folder);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Cloudinary upload failed:", errorData);
+    throw new Error("Failed to upload image.");
+  }
+
+  const result = await response.json();
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+  };
+}
+
 export async function deleteImage(publicId: string): Promise<boolean> {
-  try {
-    const result = await cloudinary.uploader.destroy(publicId);
-    return result.result === 'ok';
-  } catch (error) {
-    console.error("Error deleting image from Cloudinary:", error);
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  if (!cloudName || !apiKey || !apiSecret) {
+    throw new Error("Missing Cloudinary credentials");
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const signatureString = `public_id=${publicId}&timestamp=${timestamp}${apiSecret}`;
+  const signature = await digestMessage(signatureString);
+
+  const formData = new FormData();
+  formData.append("public_id", publicId);
+  formData.append("api_key", apiKey);
+  formData.append("timestamp", timestamp);
+  formData.append("signature", signature);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    console.error("Cloudinary delete failed:", await response.text());
     return false;
   }
+
+  const result = await response.json();
+  return result.result === "ok";
 }
